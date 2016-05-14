@@ -4,9 +4,6 @@ import {StatusBar} from 'ionic-native';
 import {ConferenceData} from './providers/conference-data';
 import {UserData} from './providers/user-data';
 import {TabsPage} from './pages/tabs/tabs';
-import {LoginPage} from './pages/login/login';
-import {SignupPage} from './pages/signup/signup';
-import {TutorialPage} from './pages/tutorial/tutorial';
 
 interface PageObj {
   title: string;
@@ -42,14 +39,8 @@ class ConferenceApp {
     { title: 'Map', component: TabsPage, index: 2, icon: 'map' },
     { title: 'About', component: TabsPage, index: 3, icon: 'information-circle' },
   ];
-  loggedInPages: PageObj[] = [
-    { title: 'Logout', component: TabsPage, icon: 'log-out' }
-  ];
-  loggedOutPages: PageObj[] = [
-    { title: 'Login', component: LoginPage, icon: 'log-in' },
-    { title: 'Signup', component: SignupPage, icon: 'person-add' }
-  ];
-  rootPage: any = TutorialPage;
+  
+  rootPage: any = TabsPage;
 
   constructor(
     private events: Events,
@@ -65,13 +56,6 @@ class ConferenceApp {
 
     // load the conference data
     confData.load();
-
-    // decide which menu items should be hidden by current login status stored in local storage
-    this.userData.hasLoggedIn().then((hasLoggedIn) => {
-      this.enableMenu(hasLoggedIn == 'true');
-    });
-
-    this.listenToLoginEvents();
   }
 
   openPage(page: PageObj) {
@@ -84,31 +68,5 @@ class ConferenceApp {
     } else {
       this.nav.setRoot(page.component);
     }
-
-    if (page.title === 'Logout') {
-      // Give the menu time to close before changing to logged out
-      setTimeout(() => {
-        this.userData.logout();
-      }, 1000);
-    }
-  }
-
-  listenToLoginEvents() {
-    this.events.subscribe('user:login', () => {
-      this.enableMenu(true);
-    });
-
-    this.events.subscribe('user:signup', () => {
-      this.enableMenu(true);
-    });
-
-    this.events.subscribe('user:logout', () => {
-      this.enableMenu(false);
-    });
-  }
-
-  enableMenu(loggedIn) {
-    this.menu.enable(loggedIn, "loggedInMenu");
-    this.menu.enable(!loggedIn, "loggedOutMenu");
   }
 }
