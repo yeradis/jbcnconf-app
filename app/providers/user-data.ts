@@ -10,12 +10,26 @@ export class UserData {
 
   constructor(private events: Events) {}
 
+  private storeData(){
+    localStorage.setItem("favorites", JSON.stringify(this._favorites));
+  }
+  
+  private loadData(){
+    var favorites = localStorage.getItem("favorites");
+    if (favorites == null) {
+      return false;
+    } 
+    this._favorites = JSON.parse(favorites);
+  }
+  
   hasFavorite(sessionName) {
+    this.loadData();
     return (this._favorites.indexOf(sessionName) > -1);
   }
 
   addFavorite(sessionName) {
     this._favorites.push(sessionName);
+    this.storeData();
   }
 
   removeFavorite(sessionName) {
@@ -23,27 +37,6 @@ export class UserData {
     if (index > -1) {
       this._favorites.splice(index, 1);
     }
-  }
-
-  login() {
-    //this.storage.set(this.HAS_LOGGED_IN, true);
-    this.events.publish('user:login');
-  }
-
-  signup() {
-    //this.storage.set(this.HAS_LOGGED_IN, true);
-    this.events.publish('user:signup');
-  }
-
-  logout() {
-    //this.storage.remove(this.HAS_LOGGED_IN);
-    this.events.publish('user:logout');
-  }
-
-  // return a promise
-  hasLoggedIn() {
-    return this.storage.get(this.HAS_LOGGED_IN).then((value) => {
-      return value;
-    });
+    this.storeData();
   }
 }
